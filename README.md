@@ -1,3 +1,5 @@
+> **Maintained by [Joseph Ukeje](https://github.com/UkejeJoseph)**
+
 <p align="center">
   <img src="docs/media/banner.png" alt="llmgate: one call is the unit of work. A Go LLM gateway with retry, an adaptive limiter, a budget, a cache and a router stacked over Anthropic, OpenAI and Gemini" width="100%"/>
 </p>
