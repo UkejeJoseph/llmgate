@@ -1,0 +1,53 @@
+// Package openai constructs an llmgate.Client backed by langchaingo's
+// OpenAI adapter.
+package openai
+
+import (
+	"fmt"
+
+	lcopenai "github.com/tmc/langchaingo/llms/openai"
+
+	"github.com/hallelx2/llmgate"
+	"github.com/hallelx2/llmgate/internal/adapter"
+)
+
+// Config configures the OpenAI client.
+type Config struct {
+	APIKey string
+	Model  string
+
+	// ReasoningModel is reserved for a future "deep reasoning" strategy
+	// (e.g. o3, o4-mini) that the engine can invoke for complex queries.
+	// Not wired into Complete today — use Request.Model to override
+	// per-call. Stored here so callers can configure it once and the
+	// engine can read it later without a config change.
+	ReasoningModel string
+
+	// BaseURL overrides the OpenAI API endpoint. Handy for Azure OpenAI,
+	// LM Studio, Ollama-openai-compat, etc.
+	BaseURL string
+}
+
+// New constructs an llmgate.Client backed by langchaingo's OpenAI adapter.
+func New(cfg Config) (llmgate.Client, error) {
+	opts := []lcopenai.Option{}
+	if cfg.APIKey != "" {
+		opts = append(opts, lcopenai.WithToken(cfg.APIKey))
+	}
+	model := cfg.Model
+	if model == "" {
+		model = "gpt-4o-mini"
+	}
+	opts = append(opts, lcopenai.WithModel(model))
+	if cfg.BaseURL != "" {
+		opts = append(opts, lcopenai.WithBaseURL(cfg.BaseURL))
+	}
+
+	m, err := lcopenai.New(opts...)
+	if err != nil {
+		return nil, fmt.Errorf("llmgate/openai: %w", err)
+	}
+	a := adapter.NewAdapter(m, llmgate.ProviderOpenAI, model, cfg.Model != "")
+	a.SetBaseURL(cfg.BaseURL)
+	return a, nil
+}
