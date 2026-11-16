@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/pkoukk/tiktoken-go v0.1.6
-	github.com/tmc/langchaingo v0.1.14
+	github.com/tmc/langchaingo v0.1.15
 	golang.org/x/oauth2 v0.36.0
 )
 
